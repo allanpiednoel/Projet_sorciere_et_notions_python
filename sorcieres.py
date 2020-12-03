@@ -108,9 +108,7 @@ class Sorciere:
         for i in range(1,5):
             if sorts_a_faire[i]>=0:
                 validation += 1
-    
-            
-        debug (mem)
+              
         if validation==4:
             print("BREW", id_a_calculer)           
             return
@@ -158,21 +156,19 @@ class Sorciere:
                     return
                 else: pass
 
-        elif sorts_a_faire[1] < 0:
-            for i in range(1):
-                if self.liste_sorts[i].castable:
-                    self.liste_sorts[i].jetteSort()
-                    return
+        elif sorts_a_faire[1] < 0:           
+            if self.liste_sorts[0].castable:
+                self.liste_sorts[0].jetteSort()
+                return
                 else: pass
 
 
-        #si on ne peut rien faire, rest restaure tout les sorts
+        #si on ne peut rien faire, rest restaure tous les sorts
 
         print("REST")
 
 
 
-        debug(mem)
         return
          
 
