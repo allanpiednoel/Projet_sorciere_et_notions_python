@@ -26,8 +26,7 @@ class Client:
     def __repr__(self):
         return f"{self.id},{self.prix}, {self.ingr0}, {self.ingr1}, {self.ingr2}, {self.ingr3}"
     
-    def jettePotion(self,id ,*args):
-        if id == self.id:
+    def jettePotion(self,*args):
             print ("BREW ",self.id)
 
     
@@ -110,7 +109,10 @@ class Sorciere:
                 validation += 1
               
         if validation==4:
-            print("BREW", id_a_calculer)           
+            for client in liste_clients:
+                if client.id==id_a_calculer:
+                    client.jettePotion()
+            #print("BREW", id_a_calculer)           
             return
 
         #Pour ne pas me perdre, j'ai changé les noms des ingrédients:
@@ -128,8 +130,8 @@ class Sorciere:
         #on commence par les ingrédients les plus longs a avoir pour faire le moins de mouvements possible
         #toujours interrompre les boucles avec return pour eviter de surcharger la sortie standart (un seul print a la fois)
         #peut etre peut-on optimiser ce bout de code?
-
-        elif sorts_a_faire[4] < 0:
+        debug(sorts_a_faire)
+        if sorts_a_faire[4] < 0:
                 
             for i in range(1,4):
 
@@ -160,11 +162,11 @@ class Sorciere:
             if self.liste_sorts[0].castable:
                 self.liste_sorts[0].jetteSort()
                 return
-                else: pass
+            else: pass
 
 
         #si on ne peut rien faire, rest restaure tous les sorts
-
+        debug("aaaaa")
         print("REST")
 
 
@@ -192,38 +194,26 @@ while True:
     best_id=0
     action_count = int(input())  # the number of spells and recipes in play
     for i in range(action_count):
-        # action_id: the unique ID of this spell or recipe
-        # action_type: in the first league: BREW; later: CAST, OPPONENT_CAST, LEARN, BREW
-        # delta_0: tier-0 ingredient change
-        # delta_1: tier-1 ingredient change
-        # delta_2: tier-2 ingredient change
-        # delta_3: tier-3 ingredient change
-        # price: the price in rupees if this is a potion
-        # tome_index: in the first two leagues: always 0; later: the index in the tome if this is a tome spell, equal to the read-ahead tax
-        # tax_count: in the first two leagues: always 0; later: the amount of taxed tier-0 ingredients you gain from learning this spell
-        # castable: in the first league: always 0; later: 1 if this is a castable player spell
-        # repeatable: for the first two leagues: always 0; later: 1 if this is a repeatable player spell
-        action_id, action_type, delta_0, delta_1, delta_2, delta_3, price, tome_index, tax_count, castable, repeatable = input().split()
-        action_id = int(action_id)
-        delta_0 = int(delta_0)
-        delta_1 = int(delta_1)
-        delta_2 = int(delta_2)
-        delta_3 = int(delta_3)
-        price = int(price)
-        #debug(action_id)
-
-        #a ignorer pour l'instant
-        tome_index = int(tome_index)
-        tax_count = int(tax_count)
-        castable = castable != "0"
-        repeatable = repeatable != "0"
+        inputs = input().split()
+        action_id = int(inputs[0])  # the unique ID of this spell or recipe
+        action_type = inputs[1]  # in the first league: BREW; later: CAST, OPPONENT_CAST, LEARN, BREW
+        delta_0 = int(inputs[2])  # tier-0 ingredient change
+        delta_1 = int(inputs[3])  # tier-1 ingredient change
+        delta_2 = int(inputs[4])  # tier-2 ingredient change
+        delta_3 = int(inputs[5])  # tier-3 ingredient change
+        price = int(inputs[6])  # the price in rupees if this is a potion
+        tome_index = int(inputs[7])  # in the first two leagues: always 0; later: the index in the tome if this is a tome spell, equal to the read-ahead tax; For brews, this is the value of the current urgency bonus
+        tax_count = int(inputs[8])  # in the first two leagues: always 0; later: the amount of taxed tier-0 ingredients you gain from learning this spell; For brews, this is how many times you can still gain an urgency bonus
+        castable = inputs[9] != "0"  # in the first league: always 0; later: 1 if this is a castable player spell
+        repeatable = inputs[10] != "0"  # for the first two leagues: always 0; later: 1 if this is a repeatable player spell
+        
 
         #differencier les clients et les sorts
         if(price!=0):
             
             liste_clients.append((Client(action_id, price, delta_0,delta_1,delta_2,delta_3)))
 
-        else:
+        elif action_id > 77:
 
             liste_sorts.append((Sorts(action_id, castable, delta_0,delta_1,delta_2,delta_3)))
 
@@ -238,15 +228,16 @@ while True:
 
 
     ma_sorciere=[]
-
+    debug(best_id)
     for i in range(2):
         # inv_0: tier-0 ingredients in inventory
         # score: amount of rupees
         inv_0, inv_1, inv_2, inv_3, score = [int(j) for j in input().split()]
         ma_sorciere.append(Sorciere(inv_0, inv_1, inv_2, inv_3, score, liste_sorts, liste_clients))
+    debug(ma_sorciere[0])
 
 
-    #effectuer un REST après avoir jeté un sort pour revenir a 0
+    #effectuer un REST après avoir jeté une potion pour revenir a 0
 
     if len(mem_score)>=3 and mem_s == 1:
 
